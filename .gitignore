@@ -1,5 +1,5 @@
 
-# elf iso objects
+# elf iso objects binaries
 /**/*.o
 /**/*.bin
 /**/*.elf
