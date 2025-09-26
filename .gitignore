@@ -1,0 +1,6 @@
+
+# elf iso objects
+/**/*.o
+/**/*.bin
+/**/*.elf
+/**/*.iso
