@@ -19,39 +19,73 @@ release = release
 # subfolders
 bootloader = $(src)/bootloader
 kernel = $(src)/kernel
-vga = $(kernel)/vga
-idt = $(kernel)/idt
-isr = $(kernel)/isr
+vga = $(src)/vga
+idt = $(src)/idt
+isr = $(src)/isr
 
 # files
 kernel_src = $(kernel)/kernel.c
 boot_src = $(bootloader)/boot.asm
-objs = $(wildcard build/*.o)
+objs = $(wildcard build/**/**/*.o)
 linker = linker.ld
-binary = $(build)/kernel.bin
+binary = $(build)/binary/kernel.bin
 cp_bin_to_elf = $(iso)/boot/kernel.elf
 nous = release/nous.iso
 
-.PHONY: all build clean $(boot_src) $(kernel_src) $(binary) $(nous) qemu_iso qemu_kernel
+.PHONY: all build clean boot kernel link $(boot_src) $(kernel_src) $(binary) $(nous) qemu_iso qemu_kernel
 
-all: build
+all: boot kernel link
+boot:	
+	@echo "===== Assembling ASM files ====="
+	@for f in $(shell find $(src) -type f -name "*.asm" ); do \
+	 out="$(build)/$${f#$(src)/}"; \
+	 out="$${out%.asm}.o"; \
+ 	 mkdir -p "$$(dirname "$$out")"; \
+	 $(asm) $(asm_flags) "$$f" -o "$$out"; \
+	 echo "$$out"; \
+	done
+	@echo ""
+
+kernel:
+	@mkdir -p $(build)
+	@echo "===== Compiling C files ====="
+	@for f in $(shell find $(src) -type f -name "*.c" ); do \
+	 out="$(build)/$${f#$(src)/}"; \
+	 out="$${out%.c}.o"; \
+ 	 mkdir -p "$$(dirname "$$out")"; \
+	 $(cxx) $(cflags) -c "$$f" -o "$$out"; \
+	 echo "$$out"; \
+	done
+	@echo ""
+
+link:
+	@echo "===== Linking all .o files ====="
+	mkdir -p $(build)/binary
+	$(ld) $(ldflags) -T $(linker) $(shell find $(build) -type f -name "*.o") -o $(binary)
+	@echo ""
+
+iso:
+	@echo "======= building iso ========="
+	cp $(binary) $(cp_bin_to_elf)
+	$(grub) -o $(nous) $(iso)
+	@echo ""
 
 build: $(boot_src) $(kernel_src) $(binary) $(nous)
 
-$(boot_src):
-	$(asm) $(asm_flags) $(boot_src) -o $(build)/boot.o
-	$(asm) $(asm_flags) $(isr)/isr.asm -o $(build)/isr_asm.o
+# $(boot_src):
+# 	$(asm) $(asm_flags) $(boot_src) -o $(build)/boot.o
+# 	$(asm) $(asm_flags) $(isr)/isr.asm -o $(build)/isr_asm.o
 
-$(kernel_src):
-	$(cxx) $(cflags) -c $(vga)/vga.c -o $(build)/vga.o
-	$(cxx) $(cflags) -c $(idt)/idt.c -o $(build)/idt.o
-	$(cxx) $(cflags) -c $(isr)/isr.c -o $(build)/isr_c.o
-	$(cxx) $(cflags) -c $(kernel_src) -o $(build)/kernel.o
+# $(kernel_src):
+# 	$(cxx) $(cflags) -c $(vga)/vga.c -o $(build)/vga.o
+# 	$(cxx) $(cflags) -c $(idt)/idt.c -o $(build)/idt.o
+# 	$(cxx) $(cflags) -c $(isr)/isr.c -o $(build)/isr_c.o
+# 	$(cxx) $(cflags) -c $(kernel_src) -o $(build)/kernel.o
 
-$(binary): $(boot_src) $(kernel_src)
-	$(ld) $(ldflags) -T $(linker) -o $(binary) $(objs)
+# $(binary): $(boot_src) $(kernel_src)
+# 	$(ld) $(ldflags) -T $(linker) -o $(binary) $(objs)
 
-$(nous): $(binary)
+$(nous):
 	cp $(binary) $(cp_bin_to_elf)
 	$(grub) -o $(nous) $(iso)
 
@@ -62,7 +96,7 @@ qemu_kernel: $(binary)
 	$(qemu) -kernel $(binary)
 
 clean:
-	rm $(build)/*.o 
-	rm $(build)/*.bin 
-	rm $(iso)/boot/*.elf
-	rm $(release)/*.iso
+	rm $(build)/**/*.o 
+	rm $(build)/**/*.bin 
+	rm $(release)/**/*.iso
+	rm $(iso)/boot/**/*.elf
