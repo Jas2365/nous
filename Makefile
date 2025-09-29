@@ -28,11 +28,11 @@ kernel_src = $(kernel)/kernel.c
 boot_src = $(bootloader)/boot.asm
 objs = $(wildcard build/**/**/*.o)
 linker = linker.ld
-binary = $(build)/binary/kernel.bin
-cp_bin_to_elf = $(iso)/boot/kernel.elf
+kernel_bin = $(build)/kernel_bin/kernel.bin
+kernel_elf = $(iso)/boot/kernel.elf
 nous = release/nous.iso
 
-.PHONY: all build clean boot kernel link $(boot_src) $(kernel_src) $(binary) $(nous) qemu_iso qemu_kernel
+.PHONY: all build clean boot kernel link $(boot_src) $(kernel_src) $(kernel_bin) $(nous) qemu_iso qemu_kernel
 
 all: build qemu_iso
 build: iso
@@ -61,17 +61,17 @@ kernel:
 
 link: boot kernel
 	@echo "===== Linking all .o files ====="
-	mkdir -p $(build)/binary
-	$(ld) $(ldflags) -T $(linker) $(shell find $(build) -type f -name "*.o") -o $(binary)
+	mkdir -p $(build)/kernel_bin
+	$(ld) $(ldflags) -T $(linker) $(shell find $(build) -type f -name "*.o") -o $(kernel_bin)
 	@echo ""
 
 iso: link
 	@echo "======= building iso ========="
-	cp $(binary) $(cp_bin_to_elf)
+	cp $(kernel_bin) $(kernel_elf)
 	$(grub) -o $(nous) $(iso)
 	@echo ""
 
-# build: $(boot_src) $(kernel_src) $(binary) $(nous)
+# build: $(boot_src) $(kernel_src) $(kernel_bin) $(nous)
 
 # $(boot_src):
 # 	$(asm) $(asm_flags) $(boot_src) -o $(build)/boot.o
@@ -83,18 +83,18 @@ iso: link
 # 	$(cxx) $(cflags) -c $(isr)/isr.c -o $(build)/isr_c.o
 # 	$(cxx) $(cflags) -c $(kernel_src) -o $(build)/kernel.o
 
-# $(binary): $(boot_src) $(kernel_src)
-# 	$(ld) $(ldflags) -T $(linker) -o $(binary) $(objs)
+# $(kernel_bin): $(boot_src) $(kernel_src)
+# 	$(ld) $(ldflags) -T $(linker) -o $(kernel_bin) $(objs)
 
 # $(nous):
-# 	cp $(binary) $(cp_bin_to_elf)
+# 	cp $(kernel_bin) $(kernel_elf)
 # 	$(grub) -o $(nous) $(iso)
 
 qemu_iso: 
 	$(qemu) -cdrom $(nous) -m 512M
 
 qemu_kernel:
-	$(qemu) -kernel $(binary)
+	$(qemu) -kernel $(kernel_bin)
 
 clean:
 	rm $(build)/**/*.o 

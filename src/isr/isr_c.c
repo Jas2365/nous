@@ -11,16 +11,53 @@ struct _registers {
   uint32_t eip, cs, eflags, usersp, ss;
 };
 
-void isr_handler(struct _registers *r) {
+const char *exception_message[] = {
+    "Divide by zero",
+    "Debug",
+    "Non Maskable Interrupt",
+    "Breakpoint",
+    "Overflow",
+    "Bound range exceeded",
+    "invalid opcode",
+    "Device not avaliable",
+    "Double fault",
+    "Coprocessor segment overrun",
+    "Ivalid TSS",
+    "Segment not present",
+    "Stack-segment fault",
+    "General protection fault",
+    "Page fault",
+    "Reserved",
+    "x87 floating point exception",
+    "Alignment check",
+    "Machine check",
+    "SIMD floating-point exception",
+    "Virtualization exception",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+};
+void isr_handler(uint32_t int_no) {
 
   vga_print_info("Received interrupt: ");
-  vga_print_hex32(r->int_no);
+  vga_print_hex32(int_no);
   vga_newline();
 
   // if its a hardware IRQ, send EOI
-  if (r->int_no < 32) {
-    vga_print_error("CPU exception haliting.");
-    for (;;)
-      asm volatile("hlt");
+  if (int_no < 32) {
+    vga_print_error(exception_message[int_no]);
+  } else {
+    vga_print_error("Unknown Exception");
   }
+  vga_print_info("System Halted");
+  for (;;)
+    asm volatile("hlt");
 }

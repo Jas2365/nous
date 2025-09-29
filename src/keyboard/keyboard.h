@@ -5,4 +5,4 @@
 
 void keyboard_init();
 uint8_t keyboard_read_scan();
-void keyboard_handler_c(uint32_t int_no);
+void keyboard_handler_c(void);

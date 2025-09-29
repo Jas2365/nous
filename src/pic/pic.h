@@ -1,3 +1,5 @@
 #pragma once
 
-void pic_remap();
+#include "../std/int.h"
+
+void pic_remap(uint8_t offset1, uint8_t offset2);

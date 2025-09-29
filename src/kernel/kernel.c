@@ -5,45 +5,47 @@
 #include "../keyboard/keyboard.h"
 #include "../pic/pic.h"
 #include "../std/int.h"
+#include "../timer/timer.h"
 #include "../utils/slow.h"
 #include "../vga/vga.h"
 
 void kernel_main() {
-
-  /**
-   *
-   *    Rewrite
-   *    - isr_asm.asm
-   *    - isr_c
-   *    - make separate irq_c
-   *    - make separate irq_asm
-   *
-   */
-
   vga_clear();
 
-  vga_print_info("Initialising GDT...");
+  vga_print_info("Initialising GDT");
   gdt_init();
-  vga_print_info("GDT loaded successfully");
-  vga_print_info("Initialising IDT...");
+  // vga_print_info("GDT loaded successfully");
+
+  vga_print_info("Initialising IDT");
   idt_init();
-  vga_print_info("IDT loaded successfully");
+  // vga_print_info("IDT loaded successfully");
 
-  vga_print_info("Remapping PIC...");
-  pic_remap();
-  vga_print_info("PIC remapped");
+  vga_print_info("Remapping PIC");
+  pic_remap(0x20, 0x28);
+  // vga_print_info("PIC remapped");
 
-  vga_print_info("Initialising Keyboard...");
+  vga_print_info("Initialising Keyboard");
   keyboard_init();
-  vga_print_info("Keyboard loaded successfully");
+  // vga_print_info("Keyboard loaded successfully");
 
-  vga_print_info("printing...");
+  vga_print_info("Initialising Timer");
+  timer_init(100);
+  // vga_print_info("printing...");
 
   // __asm__ volatile ("int $0x20");
 
-  vga_print_info("before sti");
-  __asm__ volatile("sti");
-  vga_print_info("after sti");
+  // vga_print_info("before sti");
+  asm volatile("sti");
+  // vga_print_info("after sti");
+
+  vga_print_info("Kernel running with timer irq0.");
+
+  while (1) {
+    if (get_ticks() % 100 == 0) {
+      vga_print("=>");
+    }
+    asm volatile("hlt");
+  }
 
   // vga_print("irq1: ");
   // vga_print_hex((uint32_t)irq1);
@@ -96,7 +98,4 @@ void kernel_main() {
   // vga_newline();
   // vga_print_hex32(test);
   // vga_newline();
-
-  while (1) {
-  }
 }

@@ -1,5 +1,6 @@
 #include "../constants/ports.h"
 #include "../io/io.h"
+#include "../keyboard/keyboard.h"
 #include "../vga/vga.h"
 
 void pic_send_eoi(uint8_t irq) {
@@ -8,8 +9,20 @@ void pic_send_eoi(uint8_t irq) {
   outb(pic1_cmd_port, pic_eoi);   // master pic
 }
 
-void irq_handler(uint32_t irq_num) {
-  if (irq_num == 1) {
-    vga_print_info("KEYBOARD IRQ FIRED");
+extern volatile uint32_t timer_ticks;
+
+void irq_handler(uint32_t irq) {
+  switch (irq) {
+  case 0:
+    timer_ticks++;
+    break;
+
+  case 1:
+    keyboard_handler_c();
+    break;
+
+  default:
+    break;
   }
+  pic_send_eoi(irq);
 }
