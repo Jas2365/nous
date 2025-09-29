@@ -1,28 +1,26 @@
-#include "../idt/idt.h"
-#include "../vga/vga.h"
-#include "../io/io.h"
 #include "../constants/ports.h"
+#include "../idt/idt.h"
+#include "../io/io.h"
 #include "../keyboard/keyboard.h"
+#include "../vga/vga.h"
 
-void isr_handler_c(uint32_t int_no)
-{
-    if (int_no == keyboard_int)
-    {
-        keyboard_handler_c(int_no);
-        return;
-    }
+struct _registers {
+  uint32_t ds;
+  uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+  uint32_t int_no, err_code;
+  uint32_t eip, cs, eflags, usersp, ss;
+};
 
-    vga_print_info("Received interrupt: ");
-    vga_print_hex32(int_no);
-    vga_newline();
+void isr_handler(struct _registers *r) {
 
-    // if its a hardware IRQ, send EOI
-    if (int_no >= pic_irq_base && int_no < pic_irq_base + 16)
-    {
-        if (int_no >= pic_irq_base + 8)
-        {
-            outb(pic2_cmd_port, pic_eoi);
-        }
-        outb(pic1_cmd_port, pic_eoi);
-    }
+  vga_print_info("Received interrupt: ");
+  vga_print_hex32(r->int_no);
+  vga_newline();
+
+  // if its a hardware IRQ, send EOI
+  if (r->int_no < 32) {
+    vga_print_error("CPU exception haliting.");
+    for (;;)
+      asm volatile("hlt");
+  }
 }

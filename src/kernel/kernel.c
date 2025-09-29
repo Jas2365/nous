@@ -1,35 +1,27 @@
-#include "../std/int.h"
-#include "../vga/vga.h"
-#include "../idt/idt.h"
-#include "../pic/pic.h"
-#include "../io/io.h"
-#include "../keyboard/keyboard.h"
-#include "../utils/slow.h"
 #include "../debug/debug.h"
 #include "../gdt/gdt.h"
+#include "../idt/idt.h"
+#include "../io/io.h"
+#include "../keyboard/keyboard.h"
+#include "../pic/pic.h"
+#include "../std/int.h"
+#include "../utils/slow.h"
+#include "../vga/vga.h"
 
-void kernel_main()
-{
+void kernel_main() {
 
-
-/**
- * 
- *    Rewrite 
- *    - isr_asm.asm
- *    - isr_c
- *    - make separate irq_c
- *    - make separate irq_asm
- * 
- */
-
-
-
-
-
-
+  /**
+   *
+   *    Rewrite
+   *    - isr_asm.asm
+   *    - isr_c
+   *    - make separate irq_c
+   *    - make separate irq_asm
+   *
+   */
 
   vga_clear();
-  
+
   vga_print_info("Initialising GDT...");
   gdt_init();
   vga_print_info("GDT loaded successfully");
@@ -40,7 +32,7 @@ void kernel_main()
   vga_print_info("Remapping PIC...");
   pic_remap();
   vga_print_info("PIC remapped");
-  
+
   vga_print_info("Initialising Keyboard...");
   keyboard_init();
   vga_print_info("Keyboard loaded successfully");
@@ -49,9 +41,9 @@ void kernel_main()
 
   // __asm__ volatile ("int $0x20");
 
-  vga_print_info("before sti"); 
-  __asm__ volatile ("sti");
-  vga_print_info("after sti"); 
+  vga_print_info("before sti");
+  __asm__ volatile("sti");
+  vga_print_info("after sti");
 
   // vga_print("irq1: ");
   // vga_print_hex((uint32_t)irq1);
@@ -68,16 +60,14 @@ void kernel_main()
   // isr_handler_c(keyboard_int);
   // }
 
+  //   vga_newline();
 
-//   vga_newline();
-  
-//   vga_print("keyboard port deciman 60: ");
-//   sc = inb(0x64);
-//   vga_print_hex(sc);
+  //   vga_print("keyboard port deciman 60: ");
+  //   sc = inb(0x64);
+  //   vga_print_hex(sc);
 
-  // outb(pic1_data_port, 0xff); 
+  // outb(pic1_data_port, 0xff);
   // outb(pic2_data_port, 0xff);
-
 
   // vga_print_hex(0x3);
   // vga_newline();
@@ -107,7 +97,6 @@ void kernel_main()
   // vga_print_hex32(test);
   // vga_newline();
 
-  while (1)
-  {
+  while (1) {
   }
 }
