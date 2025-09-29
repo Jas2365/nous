@@ -86,6 +86,30 @@ void vga_print_hex_width(uint32_t val, uint8_t width)
 	}
 }
 
+void vga_print_hex(uint32_t val)
+{
+	if (val < 0xf)
+		vga_print_hex_width(val, 1);
+	else if (val < 0xff)
+		vga_print_hex_width(val, 2);
+
+	else if (val < 0xfff)
+		vga_print_hex_width(val, 3);
+
+	else if (val < 0xffff)
+		vga_print_hex_width(val, 4);
+
+	else if (val < 0xfffff)
+		vga_print_hex_width(val, 5);
+
+	else if (val < 0xffffff)
+		vga_print_hex_width(val, 6);
+	else if (val < 0xfffffff)
+		vga_print_hex_width(val, 7);
+	else
+		vga_print_hex_width(val, 8);
+}
+
 void vga_update_cursor(size_t row, size_t col)
 {
 	uint16_t pos = row * vga_width + col;

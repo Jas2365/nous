@@ -1,10 +1,3 @@
-
-
-global idt_load
-idt_load:
-    lidt [eax]
-    ret
-    
 [bits 32]
 
 global isr0

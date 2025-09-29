@@ -2,9 +2,16 @@
 #include "../vga/vga.h"
 #include "../io/io.h"
 #include "../constants/ports.h"
+#include "../keyboard/keyboard.h"
 
 void isr_handler_c(uint32_t int_no)
 {
+    if (int_no == keyboard_int)
+    {
+        keyboard_handler_c(int_no);
+        return;
+    }
+
     vga_print_info("Received interrupt: ");
     vga_print_hex32(int_no);
     vga_newline();

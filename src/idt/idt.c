@@ -3,10 +3,7 @@
 #include "../utils/bitmask.h"
 #include "../vga/vga.h"
 
-static struct idt_entry idt[idt_total_entries];
-static struct idt_ptr idt_descriptor;
-
-extern void idt_load();
+extern void idt_load(uint32_t idt_ptr);
 
 extern void isr0();
 extern void isr1();
@@ -57,24 +54,22 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
+struct idt_entry idt[idt_total_entries];
+struct idt_ptr idt_descriptor;
+
 void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)
 {
-    idt[num].offset_high = base & _16low;
-    idt[num].selector = sel;
-    idt[num].zero = 0;
-    idt[num].type_attr = flags;
-    idt[num].offset_high = (base >> 16) & _16low;
+    idt[num].offset_low     = (uint16_t)(base & 0xffff);
+    idt[num].selector       = sel;
+    idt[num].zero           = 0;
+    idt[num].type_attr      = flags;
+    idt[num].offset_high    = (uint16_t)((base >> 16) & 0xffff);
 }
 
 void idt_init()
 {
-    idt_descriptor.limit - sizeof(struct idt_entry) * idt_total_entries - 1;
     idt_descriptor.base = (uint32_t)&idt;
-
-    for (int i = 0; i < idt_total_entries - 1; i++)
-    {
-        idt_set_gate(i, 0, 0, 0);
-    }
+    idt_descriptor.limit = sizeof(struct idt_entry) * idt_total_entries - 1;
 
     // cpu exceptions 0-31
     idt_set_gate(0, (uint32_t)isr0, kernel_code_segment, idt_flag_kernel);
@@ -110,22 +105,28 @@ void idt_init()
     idt_set_gate(31, (uint32_t)isr31, kernel_code_segment, idt_flag_kernel);
 
     // iqr 32 - 47
-    idt_set_gate(0, (uint32_t)irq0, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(1, (uint32_t)irq1, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(2, (uint32_t)irq2, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(3, (uint32_t)irq3, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(4, (uint32_t)irq4, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(5, (uint32_t)irq5, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(6, (uint32_t)irq6, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(7, (uint32_t)irq7, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(8, (uint32_t)irq8, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(9, (uint32_t)irq9, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(10, (uint32_t)irq10, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(11, (uint32_t)irq11, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(12, (uint32_t)irq12, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(13, (uint32_t)irq13, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(14, (uint32_t)irq14, kernel_code_segment, idt_flag_kernel);
-    idt_set_gate(15, (uint32_t)irq15, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 0, (uint32_t)irq0, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(keyboard_int, (uint32_t)irq1, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 2, (uint32_t)irq2, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 3, (uint32_t)irq3, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 4, (uint32_t)irq4, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 5, (uint32_t)irq5, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 6, (uint32_t)irq6, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 7, (uint32_t)irq7, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 8, (uint32_t)irq8, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 9, (uint32_t)irq9, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 10, (uint32_t)irq10, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 11, (uint32_t)irq11, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 12, (uint32_t)irq12, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 13, (uint32_t)irq13, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 14, (uint32_t)irq14, kernel_code_segment, idt_flag_kernel);
+    idt_set_gate(pic_irq_base + 15, (uint32_t)irq15, kernel_code_segment, idt_flag_kernel);
+
+    // rest are zeros
+    for (int i = 48; i < idt_total_entries; i++)
+    {
+        idt_set_gate(i, 0, 0, 0);
+    }
 
     idt_load((uint32_t)&idt_descriptor);
 }

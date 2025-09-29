@@ -54,7 +54,7 @@ void vga_print_hex_width(uint32_t val, uint8_t width);
 static inline void vga_print_hex8(uint8_t val) { vga_print_hex_width(val, 2); }
 static inline void vga_print_hex16(uint16_t val) { vga_print_hex_width(val, 4); }
 static inline void vga_print_hex32(uint32_t val) { vga_print_hex_width(val, 8); }
-
+void vga_print_hex(uint32_t val);
 void vga_update_cursor(size_t row, size_t col);
 void vga_disable_cursor();
 void vga_enable_cursor(uint8_t start, uint8_t end);

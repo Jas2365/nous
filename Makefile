@@ -34,7 +34,8 @@ nous = release/nous.iso
 
 .PHONY: all build clean boot kernel link $(boot_src) $(kernel_src) $(binary) $(nous) qemu_iso qemu_kernel
 
-all: boot kernel link
+all: build qemu_iso
+build: iso
 boot:	
 	@echo "===== Assembling ASM files ====="
 	@for f in $(shell find $(src) -type f -name "*.asm" ); do \
@@ -58,19 +59,19 @@ kernel:
 	done
 	@echo ""
 
-link:
+link: boot kernel
 	@echo "===== Linking all .o files ====="
 	mkdir -p $(build)/binary
 	$(ld) $(ldflags) -T $(linker) $(shell find $(build) -type f -name "*.o") -o $(binary)
 	@echo ""
 
-iso:
+iso: link
 	@echo "======= building iso ========="
 	cp $(binary) $(cp_bin_to_elf)
 	$(grub) -o $(nous) $(iso)
 	@echo ""
 
-build: $(boot_src) $(kernel_src) $(binary) $(nous)
+# build: $(boot_src) $(kernel_src) $(binary) $(nous)
 
 # $(boot_src):
 # 	$(asm) $(asm_flags) $(boot_src) -o $(build)/boot.o
@@ -98,5 +99,5 @@ qemu_kernel: $(binary)
 clean:
 	rm $(build)/**/*.o 
 	rm $(build)/**/*.bin 
-	rm $(release)/**/*.iso
-	rm $(iso)/boot/**/*.elf
+	rm $(release)/*.iso
+	rm $(iso)/boot/*.elf
