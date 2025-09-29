@@ -86,14 +86,14 @@ iso: link
 # $(binary): $(boot_src) $(kernel_src)
 # 	$(ld) $(ldflags) -T $(linker) -o $(binary) $(objs)
 
-$(nous):
-	cp $(binary) $(cp_bin_to_elf)
-	$(grub) -o $(nous) $(iso)
+# $(nous):
+# 	cp $(binary) $(cp_bin_to_elf)
+# 	$(grub) -o $(nous) $(iso)
 
-qemu_iso: $(nous)
+qemu_iso: 
 	$(qemu) -cdrom $(nous) -m 512M
 
-qemu_kernel: $(binary)
+qemu_kernel:
 	$(qemu) -kernel $(binary)
 
 clean:
