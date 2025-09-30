@@ -48,7 +48,7 @@ const char *exception_message[] = {
 void isr_handler(uint32_t int_no) {
 
   vga_print_info("Received interrupt: ");
-  vga_print_hex32(int_no);
+  vga_print_hex(int_no);
   vga_newline();
 
   // if its a hardware IRQ, send EOI
