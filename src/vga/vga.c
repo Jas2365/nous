@@ -63,8 +63,6 @@ void vga_putc(char c) {
   const size_t index = vga_row * vga_width + vga_col;
   vga_buffer[index] = vga_entry(c, vga_color);
 
-  slow_down();
-
   if (++vga_col == vga_width) {
     vga_col = 0;
     if (++vga_row == vga_height)
@@ -91,6 +89,27 @@ void vga_print_hex_width(uint32_t val, uint8_t width) {
   for (int i = (width - 1) * 4; i >= 0; i -= 4) {
     uint8_t nibble = (val >> i) & 0xf;
     vga_putc(hex_digit(nibble));
+  }
+}
+void vga_print_dec(uint32_t val) {
+  if (val < 0) {
+    vga_putc('-');
+    val = -val;
+  }
+  if (val == 0) {
+    vga_putc('0');
+    return;
+  }
+
+  char buffer[12]; // enough for -2^31
+  int i = 0;
+
+  while (val > 0) {
+    buffer[i++] = '0' + (val % 10);
+    val /= 10;
+  }
+  while (i--) {
+    vga_putc(buffer[i]);
   }
 }
 

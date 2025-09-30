@@ -6,6 +6,7 @@
 #include "../pic/pic.h"
 #include "../std/int.h"
 #include "../timer/timer.h"
+#include "../utils/loading.h"
 #include "../utils/slow.h"
 #include "../vga/vga.h"
 
@@ -38,12 +39,24 @@ void kernel_main() {
   asm volatile("sti");
   // vga_print_info("after sti");
 
-  vga_print_info("Kernel running with timer irq0.");
+  // int time = 0; // 4294967291;
+  // int one = 1;
 
+  // for (int i = 0; i <= 100; i += 5) {
+  //   vga_clear();
+  //   loading(i);
+  // }
   while (1) {
-    if (get_ticks() % 100 == 0) {
-      vga_print("=>");
-    }
+    // vga_clear();
+
+    // if (get_ticks() % 100 == 0) {
+    //   vga_print_info("TIME");
+    //   vga_print("Time in seconds: ");
+    //   vga_print_dec(time);
+    //   vga_newline();
+    //   time++;
+    // }
+
     asm volatile("hlt");
   }
 
