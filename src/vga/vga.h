@@ -1,8 +1,8 @@
 #pragma once
-#include "../constants/ports.h"
+#include "../ports/ports.h"
 #include "../std/int.h"
 
-// VGA text mode constants
+// VGA text mode ports
 #define vga_address 0xb8000
 #define vga_width 80
 #define vga_height 25
