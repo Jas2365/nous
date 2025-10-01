@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../constants/ports.h"
 #include "../io/io.h"
+#include "../ports/ports.h"
 #include "../vga/vga.h"
 
 static inline void test_run() { vga_print_info("Running"); }

@@ -1,15 +1,8 @@
-#include "../constants/ports.h"
 #include "../idt/idt.h"
 #include "../io/io.h"
 #include "../keyboard/keyboard.h"
+#include "../ports/ports.h"
 #include "../vga/vga.h"
-
-struct _registers {
-  uint32_t ds;
-  uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-  uint32_t int_no, err_code;
-  uint32_t eip, cs, eflags, usersp, ss;
-};
 
 const char *exception_message[] = {
     "Divide by zero",
