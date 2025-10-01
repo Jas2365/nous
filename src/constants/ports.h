@@ -41,3 +41,8 @@
 // Timer
 #define pit_channel0 0x40
 #define pit_command 0x43
+
+// Memory
+#define page_size 4096
+#define max_memory 0x10000000
+#define total_pages (max_memory / page_size)
