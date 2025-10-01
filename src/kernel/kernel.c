@@ -4,6 +4,7 @@
 #include "../io/io.h"
 #include "../keyboard/keyboard.h"
 #include "../pic/pic.h"
+#include "../pmm/pmm.h"
 #include "../std/int.h"
 #include "../timer/timer.h"
 #include "../utils/slow.h"
@@ -33,65 +34,56 @@ void kernel_main() {
 
   // vga_print_info("printing...");
 
-  // __asm__ volatile ("int $0x20");
+  pmm_init(128 * 1024); // assume 128mb
+  // mark first 1 mb as reserved (kernel + bios)
+
+  pmm_mark_region_free(0x00100000, 127 * 1024 * 1024);
 
   // vga_print_info("before sti");
   asm volatile("sti");
   // vga_print_info("after sti");
 
+  void *a = pmm_alloc_page();
+  void *b = pmm_alloc_page();
+  void *c = pmm_alloc_page();
+  void *d = pmm_alloc_page();
+
+  vga_print_info("Allocated Pages");
+  vga_print_hex((uint32_t)a);
+  vga_newline();
+  vga_print_hex((uint32_t)b);
+  vga_newline();
+  vga_print_hex((uint32_t)c);
+  vga_newline();
+  vga_print_hex((uint32_t)d);
+  vga_newline();
+
   while (1) {
     asm volatile("hlt");
   }
-
-  // vga_print("irq1: ");
-  // vga_print_hex((uint32_t)irq1);
-  // vga_newline();
-
-  // vga_print("idt 33 h:");
-  // vga_print_hex(idt[33].offset_high);
-  // vga_newline();
-  // vga_print("idt 33 l:");
-  // vga_print_hex(idt[33].offset_low);
-  // vga_newline();
-
-  // while(1){
-  // isr_handler_c(keyboard_int);
-  // }
-
-  //   vga_newline();
-
-  //   vga_print("keyboard port deciman 60: ");
-  //   sc = inb(0x64);
-  //   vga_print_hex(sc);
-
-  // outb(pic1_data_port, 0xff);
-  // outb(pic2_data_port, 0xff);
-
-  // vga_print_hex(0x3);
-  // vga_newline();
-  // vga_print_hex(0x23);
-  // vga_newline();
-  // vga_print_hex(0x233);
-  // vga_newline();
-  // vga_print_hex(0x2333);
-  // vga_newline();
-  // vga_print_hex(0x23443);
-  // vga_newline();
-
-  // vga_print_info("Nous Os kernel started");
-  // vga_print_warn("Keyboard not initialized yet");
-  // vga_print_error("Disk driver missing");
-
-  // vga_newline();
-  // vga_print("All systems nominal.");
-  // vga_newline();
-
-  // uint32_t test = 0xbeef;
-
-  // vga_print_hex8(test);
-  // vga_newline();
-  // vga_print_hex16(test);
-  // vga_newline();
-  // vga_print_hex32(test);
-  // vga_newline();
 }
+
+// uint32_t seconds = 0;
+// uint32_t frame = 0;
+// uint32_t last_tick = 0;
+// uint32_t last_anim_tick = 0;
+
+// uint32_t current_ticks = get_ticks();
+
+// // update seconds every 1000 ms
+// if (current_ticks - last_tick >= 100) {
+//   last_tick = current_ticks;
+//   seconds++;
+
+//   vga_clear();
+//   vga_print_info("TIME");
+//   vga_print("Time in seconds: ");
+//   vga_print_dec(seconds);
+//   vga_print("  "); // overwrite old digits
+//                    // }
+//                    // // -- update loading every 100 ms
+//                    // if (current_ticks - last_tick >= 10) {
+//   last_anim_tick = current_ticks;
+//   loading(frame);
+//   frame = (frame + 1) % frames_size;
+// }
