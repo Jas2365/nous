@@ -45,15 +45,15 @@ const char *exception_message[] = {
     "Reserved",
     "Reserved",
 };
-void isr_handler(uint32_t int_no) {
+void isr_handler(uint32_t isr) {
 
   vga_print_info("Received interrupt: ");
-  vga_print_hex(int_no);
+  vga_print_hex(isr);
   vga_newline();
 
   // if its a hardware IRQ, send EOI
-  if (int_no < 32) {
-    vga_print_error(exception_message[int_no]);
+  if (isr < 32) {
+    vga_print_error(exception_message[isr]);
   } else {
     vga_print_error("Unknown Exception");
   }
