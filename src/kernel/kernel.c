@@ -30,6 +30,7 @@ void kernel_main() {
 
   vga_print_info("Initialising Timer");
   timer_init(100);
+
   // vga_print_info("printing...");
 
   // __asm__ volatile ("int $0x20");
@@ -38,12 +39,7 @@ void kernel_main() {
   asm volatile("sti");
   // vga_print_info("after sti");
 
-  vga_print_info("Kernel running with timer irq0.");
-
   while (1) {
-    if (get_ticks() % 100 == 0) {
-      vga_print("=>");
-    }
     asm volatile("hlt");
   }
 

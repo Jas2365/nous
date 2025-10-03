@@ -51,7 +51,7 @@ void vga_putc(char c) {
       vga_col--;
     else if (vga_row > 0) {
       vga_row--;
-      vga_col = 5;
+      vga_col = 79;
     }
     vga_buffer[vga_row * 80 + vga_col] = (0x0f << 8) | ' '; // erase char
     if (vga_row == vga_height)
