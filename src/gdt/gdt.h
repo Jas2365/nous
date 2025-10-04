@@ -1,4 +1,4 @@
-#pragma once
+_Pragma("once");
 
 #include "../std/int.h"
 
@@ -19,7 +19,6 @@ struct gdt_ptr {
 #define gdt_entries 3
 
 extern struct gdt_entry gdt[gdt_entries];
-extern struct gdt_ptr   gp;
-
+extern struct gdt_ptr gp;
 
 void gdt_init(void);

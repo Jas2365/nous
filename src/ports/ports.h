@@ -1,4 +1,4 @@
-#pragma once
+_Pragma("once");
 
 // VGA i/o ports
 #define vga_port_cmd 0x03d4

@@ -1,4 +1,4 @@
-#pragma once
+_Pragma("once");
 
 static inline void slow_down() {
   for (volatile int j = 0; j < 1000000 / 2; j++)

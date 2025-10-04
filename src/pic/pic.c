@@ -1,7 +1,8 @@
 #include "pic.h"
-#include "../constants/ports.h"
 #include "../idt/idt.h"
 #include "../io/io.h"
+#include "../ports/ports.h"
+
 
 void pic_remap(uint8_t offset1, uint8_t offset2) {
   uint8_t mask1, mask2;

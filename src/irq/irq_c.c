@@ -1,7 +1,8 @@
-#include "../constants/ports.h"
 #include "../io/io.h"
 #include "../keyboard/keyboard.h"
+#include "../ports/ports.h"
 #include "../vga/vga.h"
+
 
 void pic_send_eoi(uint8_t irq) {
   if (irq >= 8)

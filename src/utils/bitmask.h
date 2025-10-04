@@ -1,4 +1,4 @@
-#pragma once
+_Pragma("once");
 
 #define _4low 0xf
 #define _8low 0xff

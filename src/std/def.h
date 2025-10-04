@@ -1,3 +1,3 @@
-#pragma once
+_Pragma("once");
 
 #define NULL ((void *)0)

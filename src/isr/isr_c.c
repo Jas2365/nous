@@ -1,8 +1,9 @@
-#include "../constants/ports.h"
 #include "../idt/idt.h"
 #include "../io/io.h"
 #include "../keyboard/keyboard.h"
+#include "../ports/ports.h"
 #include "../vga/vga.h"
+
 
 struct _registers {
   uint32_t ds;

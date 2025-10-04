@@ -1,6 +1,7 @@
-#include "../constants/ports.h"
 #include "../io/io.h"
+#include "../ports/ports.h"
 #include "../std/int.h"
+
 
 void timer_init(uint32_t frequency) {
   uint32_t divisor = 1193180 / frequency;    // pit input clock is 1.19318 MHz
