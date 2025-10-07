@@ -64,6 +64,12 @@ void vga_enable_cursor(uint8_t start, uint8_t end);
 
 void vga_scroll();
 void vga_set_cursor(size_t row, size_t col);
+void vga_move_cursor_left();
+void vga_move_cursor_right();
+void vga_move_cursor_up();
+void vga_move_cursor_down();
+void vga_blink_cursor();
+
 void vga_print_info(const char *msg);
 void vga_print_warn(const char *msg);
 void vga_print_error(const char *msg);

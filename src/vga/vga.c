@@ -2,9 +2,10 @@
 #include "../io/io.h"
 #include "../utils/slow.h"
 
-static volatile uint16_t *vga_buffer = (uint16_t *)vga_address;
+static uint16_t *vga_buffer = (uint16_t *)vga_address;
 static size_t vga_row = 0;
 static size_t vga_col = 0;
+static uint8_t vga_cursor_visible = 1;
 static uint8_t vga_color = 0x07; // light grey on black
 
 // combine character + attribute byte
@@ -63,7 +64,7 @@ void vga_putc(char c) {
   const size_t index = vga_row * vga_width + vga_col;
   vga_buffer[index] = vga_entry(c, vga_color);
 
-  slow_down();
+  // slow_down(); stoped slowdown
 
   if (++vga_col == vga_width) {
     vga_col = 0;
@@ -158,6 +159,67 @@ void vga_set_cursor(size_t row, size_t col) {
     return;
   vga_row = row;
   vga_col = col;
+}
+
+void vga_move_cursor_left() {
+  if (vga_row == 0 && vga_col == 0)
+    return;
+
+  if (vga_col == 0) {
+    vga_col = vga_width - 1;
+    vga_row--;
+  } else if (vga_col > 0) {
+    vga_col--;
+  }
+  vga_update_cursor(vga_row, vga_col);
+  return;
+}
+
+void vga_move_cursor_right() {
+  if (vga_row == vga_height - 1 && vga_col == vga_width - 1)
+    return;
+
+  if (vga_col == vga_width - 1) {
+    vga_col = 0;
+    vga_row++;
+  } else if (vga_col < vga_width - 1) {
+    vga_col++;
+  }
+  vga_update_cursor(vga_row, vga_col);
+  return;
+}
+
+void vga_move_cursor_up() {
+  if (vga_row > 0) {
+    vga_row--;
+    vga_update_cursor(vga_row, vga_col);
+    return;
+  }
+}
+
+void vga_move_cursor_down() {
+  if (vga_row < vga_height - 1) {
+    vga_row++;
+    vga_update_cursor(vga_row, vga_col);
+    return;
+  }
+}
+
+extern uint32_t timer_ticks;
+
+void vga_blink_cursor() {
+  static uint32_t last_tick = 0;
+  if (timer_ticks - last_tick >= 50) {
+    last_tick = timer_ticks;
+    uint16_t *cell = &vga_buffer[vga_row * vga_width + vga_col];
+    if (vga_cursor_visible) {
+      *cell = (*cell & 0x00ff) | (0x0f << 8); // normal color
+      vga_cursor_visible = 0;
+    } else {
+      *cell = (*cell & 0x00ff) | (0xf0 << 8); // inverted color black
+      vga_cursor_visible = 1;
+    }
+  }
 }
 
 void vga_print_info(const char *msg) {
